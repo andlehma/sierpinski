@@ -9,6 +9,7 @@ function mouseWheelHandler(e){
 	var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 	oneTri.w += delta * 0.05 * oneTri.w;
 
+	//handling for main triangle getting too big or too small
 	if (oneTri.w > (2 * canvas.width)){
 		oneTri.w /= 2;
 	}
@@ -21,12 +22,11 @@ function triangle(x, y, w){
 	this.x = x;
 	this.y = y
 	this.w = w;
-	this.initW = w;
 	this.fractal = [];
 
-	this.iterate = function(){
+	this.iterate = function(){//create 3 sub-triangles
 		this.fractal = [];
-		if (this.w > 16){
+		if (this.w > 16){//smaller for a tighter fractal, larger for better performance
 			this.fractal.push(new triangle(this.x, this.y, this.w / 2));
 			this.fractal.push(new triangle(this.x + (this.w / 2), this.y, this.w / 2));
 			this.fractal.push(new triangle(this.x, this.y + (this.w / 2), this.w / 2));
@@ -43,7 +43,7 @@ function triangle(x, y, w){
 		ctx.lineTo(this.x, this.y);
 		ctx.stroke();
 		this.fractal.forEach(tri => {
-			tri.iterate();
+			tri.iterate();//recursion lul
 			tri.draw();
 		});
 	}
@@ -56,6 +56,7 @@ function animate(){
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	oneTri.draw();
+	//if triangle width has changed, re-calculate all sub-triangles
 	if (oneTri.w != oldW){
 		oneTri.iterate();
 		oldW = oneTri.w;
